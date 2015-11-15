@@ -6,15 +6,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . '/libraries/REST_Controller.php';
 
 /**
- * This is an example of a few basic user interaction methods you could use
- * all done with a hardcoded array
- *
- * @package         CodeIgniter
- * @subpackage      Rest Server
- * @category        Controller
- * @author          Phil Sturgeon, Chris Kacerguis
- * @license         MIT
- * @link            https://github.com/chriskacerguis/codeigniter-restserver
+ * @author          Satria, Samstudio.inc
+ * @license         None
+ * @link            https://github.com/satryaway/isbn_synopsis
  */
 class Buku extends REST_Controller {
 
@@ -225,8 +219,6 @@ class Buku extends REST_Controller {
 		}
 		//---------
 		
-		//die($q);
-		
 		$query = $this->db->query($q);
 
         if ($this->db->affected_rows() == 1) {
@@ -240,24 +232,21 @@ class Buku extends REST_Controller {
 		}
     }
 
-    public function buku_delete()
-    {
-        $id = (int) $this->get('id');
-
-        // Validate the id.
-        if ($id <= 0)
-        {
-            // Set the response and exit
-            $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
-        }
-
-        // $this->some_model->delete_something($id);
-        $message = [
-            'id' => $id,
-            'message' => 'Deleted the resource'
-        ];
-
-        $this->set_response($message, REST_Controller::HTTP_NO_CONTENT); // NO_CONTENT (204) being the HTTP response code
+    public function buku_delete($id)
+    {				
+		$q = "DELETE FROM `book` WHERE id = '$id'";
+		
+		$query = $this->db->query($q);
+		
+        if ($this->db->affected_rows() == 1) {
+			$response['status'] = 1;
+			$response['message'] = "You have successfully deleted a book";
+			$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code	
+		} else {
+			$response['status'] = 0;
+			$response['message'] = "Failed deleting a book";
+			$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+		}
     }
 
 }

@@ -62,5 +62,6 @@ $route['example/users'] = 'api/example/users';
 $route['example/users/(:num)'] = 'api/example/users/id/$1'; // Example 4
 $route['example/users/(:num)(\.)([a-zA-Z0-9_-]+)(.*)'] = 'api/example/users/id/$1/format/$3$4'; // Example 8
 $route['buku'] = 'buku/buku';
+$route['buku/(:num)'] = 'buku/buku/$1';
 $route['buku/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)(.*)'] = 'buku/buku/key/$1/value/$2';
 
