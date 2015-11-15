@@ -125,12 +125,19 @@ class Buku extends REST_Controller {
 
 					$cover = $config['file_name'].'.'.$ext;
 				} else {
+					//$error = array('error' => $this->upload->display_errors());
+					$error = array('error' => $this->upload->file_type);
+					//$error = array('error' => $this->response($_FILES));
+					//$data['message']="error =".$error['error'];
+					//continue;  
+
 				$response['status'] = 0;
-				$response['message'] = "Failed uploading cover image";
+				$response['message'] = $error['error'];
 				$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
 				}
 			}
 			//---------
+			
 			
 			$query = $this->db->query('
 					INSERT INTO `book` (
