@@ -102,7 +102,84 @@ class Buku extends REST_Controller {
 		$penulis = $this->post('penulis');
 		$isbn = $this->post('isbn');
 		$sinopsis = $this->post('sinopsis');
+		$isUpdate = $this->post('isUpdate');
+		
+		if ($isUpdate == true) 
+		{
+			$this->update_book();
+		} 
+		else 
+		{	
+			//---------
+			if (isset($_FILES['cover']) && !empty($_FILES['cover']['name'])) 
+			{
+				$filename = uniqid();
+				$config['upload_path'] = "./assets/images/";
+				$config['file_name'] = $filename;
+				$config['allowed_types'] = "gif|jpg|png|jpeg";
+				$config['max_size'] = '5120';
+				$config['overwrite'] = false;
+				
+				$this->load->library('upload', $config);
+				
+				if ($this->upload->do_upload('cover')) {
+					$upload_data = $this->upload->data();
+					$_POST['cover'] = $upload_data;
+
+					$name = $upload_data['file_name'];
+					$ext = end((explode(".",$name)));
+
+					$cover = $config['file_name'].'.'.$ext;
+				} else {
+				$response['status'] = 0;
+				$response['message'] = "Failed uploading cover image";
+				$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+				}
+			}
+			//---------
+			
+			$query = $this->db->query('
+					INSERT INTO `book` (
+						`kode`,
+						`judul`,
+						`penulis`,
+						`isbn`,
+						`sinopsis`,
+						`cover`
+					) VALUES (
+						"'.$kode.'",
+						"'.$judul.'",
+						"'.$penulis.'",
+						"'.$isbn.'",
+						"'.$sinopsis.'",
+						"'.$cover.'"
+					)
+				');
+
+			if ($this->db->affected_rows() == 1) {
+				$response['status'] = 1;
+				$response['message'] = "You have successfully inputted a book";
+				$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code	
+			} else {
+				$response['status'] = 0;
+				$response['message'] = "Failed inputting a book";
+				$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+			}
+		}
+    }
 	
+	public function update_book()
+    {
+        $response = array();
+		$data = array();
+		
+		$id = $this->post('id');
+		$kode = $this->post('kode');
+		$judul = $this->post('judul');
+		$penulis = $this->post('penulis');
+		$isbn = $this->post('isbn');
+		$sinopsis = $this->post('sinopsis');
+		
 		//---------
 		if (isset($_FILES['cover']) && !empty($_FILES['cover']['name'])) 
 		{
@@ -123,39 +200,42 @@ class Buku extends REST_Controller {
 				$ext = end((explode(".",$name)));
 
 				$cover = $config['file_name'].'.'.$ext;
+				$q = "UPDATE `book` SET 
+                    `kode` = '$kode',
+                    `judul` = '$judul',
+                    `penulis` = '$penulis',
+                    `isbn` = '$isbn',
+                    `sinopsis` = '$sinopsis',
+                    `cover` = '$cover'
+					WHERE id = '$id'";
 			} else {
-			$response['status'] = 0;
-			$response['message'] = "Failed uploading cover image";
-			$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+				$response['status'] = 0;
+				$response['message'] = "Failed uploading cover image";
+				$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
 			}
+		} else {
+			$q = "UPDATE `book` 
+					SET 
+                    `kode` = $kode,
+                    `judul` = '$judul',
+                    `penulis` = '$penulis',
+                    `isbn` = '$isbn',
+                    `sinopsis` = '$sinopsis'
+					WHERE id = '$id'";
 		}
 		//---------
 		
-		$query = $this->db->query('
-                INSERT INTO `book` (
-                    `kode`,
-                    `judul`,
-                    `penulis`,
-                    `isbn`,
-                    `sinopsis`,
-                    `cover`
-                ) VALUES (
-                    "'.$kode.'",
-                    "'.$judul.'",
-                    "'.$penulis.'",
-                    "'.$isbn.'",
-                    "'.$sinopsis.'",
-                    "'.$cover.'"
-                )
-            ');
+		//die($q);
+		
+		$query = $this->db->query($q);
 
         if ($this->db->affected_rows() == 1) {
 			$response['status'] = 1;
-			$response['message'] = "You have successfully inputted a book";
+			$response['message'] = "You have successfully updated a book";
 			$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code	
 		} else {
 			$response['status'] = 0;
-			$response['message'] = "Failed inputting a book";
+			$response['message'] = "Failed updating a book";
 			$this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
 		}
     }
