@@ -81,7 +81,7 @@ class Buku extends REST_Controller {
 			} else {
 					$response['status'] = 0;
 					$response['message'] = "Book not found";                
-					$this->response($response, REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+					$this->response($response, REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
 			}
 		}
     }
